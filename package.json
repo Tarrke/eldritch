@@ -1,0 +1,12 @@
+{
+    "name": "mon-mush",
+    "version": "0.1.1",
+    "dependencies": {
+        "express": "~4.15.0",
+        "ejs": "~2.5.0",
+        "socket.io": "~2.0.0",
+        "ent": "~2.2.0"
+    },
+    "author": "Tarrke <tarrke@gmail.com>",
+    "description": "Une nouvelle version de mush"
+}
