@@ -237,23 +237,37 @@
                         game.load.image('logo', 'images/phaser.png');
                         game.load.image('tile1', 'tiles/000.png');
                         game.load.image('tile2', 'tiles/001.png');
+                        
+                        game.load.spritesheet('character', 'characterSheets/cowboy.png', 128, 128, 140);
                     },
                     create: function() {
                         game.state.start('title');
                     }
                 };
                 var titleState = {
+                    player: {
+                    },
                     create: function() {
-                        
+                        var self = this;
                         //~ var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
                         //~ logo.anchor.setTo(0.5, 0.5);
                         
                         game.stage.backgroundColor = '#cccccc';
+                        game.stage.disableVisibilityChange = true;
                         console.log("Initialising gameScene");
                         gameScene = game.add.renderTexture(game.width,game.height);
                         game.add.sprite(0,0,gameScene);
                         floorSprite = game.make.sprite(0,0,'tile1');
                         wallSprite = game.make.sprite(0,0,'tile2');
+                        
+                        self.player = game.add.sprite(200,200, 'character');
+                        self.player.frame = 1;
+                        game.add.existing(self.player);
+                        self.player.anchor.setTo(.5, 1);
+                        
+                        self.player.animations.add('walk', [57, 58, 59, 60, 61, 62, 63, 64], 4);
+                        self.player.animations.play('walk');
+                        
                         
                         createLevel();
                         
@@ -263,6 +277,10 @@
                         game.input.activePointer.capture = true;
                     },
                     update: function() {
+                        var self = this;
+                        
+                        self.player.animations.play('walk');
+                        
                         if( game.input.activePointer.isDown ) {
                             //~ game.state.start('play');
                         }
