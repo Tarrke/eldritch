@@ -10,8 +10,6 @@ var server = require('http').createServer(app),
 
 var clients = [];
 
-console.log('I am alive');
-
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
