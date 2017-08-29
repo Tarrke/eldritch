@@ -17,6 +17,13 @@
             #head {text-align:center;}
         </style>
         <script src="//cdn.jsdelivr.net/phaser/2.5.0/phaser.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
+        <script src="js/graphics.js"></script>
+        <script src="js/load.js"></script>
+        <script src="js/boot.js"></script>
+        <script src="js/title.js"></script>
+        <script src="js/game.js"></script>        
     </head>
  
     <body>
@@ -31,9 +38,6 @@
             </div>
             <div id="jeu" class="middle">
                 <div id='gameDiv'></div>
-<!--
-                <img src="images/janice_kent.jpg" style="width: 100%;"/>
--->
             </div>
             <div id="chat" class="right">
                 <form action="/" method="post" id="form_client">
@@ -50,154 +54,7 @@
             </div>
         </div>
 
-        <script src="/socket.io/socket.io.js"></script>
         <script src="js/client.js"></script>
-        <script type="text/javascript">
-            
-            window.onload = function() {
-                var gameScene;
-                var tileWidth = 24;
-                var floorSprite;
-                var wallSprite;
-                var wallHeight = 0;
-                var borderOffset = new Phaser.Point(250,50); //to centralize the isometric level display
-                
-                var levelData = 
-                    [[1,1,1,1,1,1],
-                     [1,0,0,0,0,1],
-                     [1,0,0,0,0,1],
-                     [1,0,0,0,0,1],
-                     [1,0,0,0,0,1],
-                     [1,1,1,1,1,1]];
-
-                function createLevel() {
-                    var tileType = 0;
-                    //~ for( var i = 0; i < levelData.lenght; i++ ) {
-                        //~ for( var j = 0; j < levelData[0].lenght; j++) {
-                            //~ tileType = levelData[i][j];
-                            //~ placeTile(tileType, i, j);
-                        //~ }
-                    //~ }
-                    
-                    //~ heroMapTile = new Phaser.Point(0,0);
-                    //~ addHero();
-                    //~ ...
-                    
-                    renderScene();
-                }
-                
-                function renderScene() {
-                    console.log("calling renderScene()");
-                    gameScene.clear();
-                    var tileType = 0;
-                    for( var i = 0; i < levelData.length; ++i ) {
-                        for( var j = 0; j < levelData[0].length; ++j ) {
-                            tileType = levelData[i][j];
-                            drawTileIso(tileType, i,j);
-                        }
-                    }
-                }
-                
-                function drawTileIso(tileType, i, j) {
-                    var isoPt  = new Phaser.Point();
-                    var cartPt = new Phaser.Point();
-                    cartPt.x = j*tileWidth;
-                    cartPt.y = i*tileWidth;
-                    isoPt = cartesianToIsometric(cartPt);
-                    if(tileType == 1) {
-                        gameScene.renderXY(floorSprite, isoPt.x+borderOffset.x, isoPt.y + borderOffset.y - wallHeight, false);
-                    } else {
-                        gameScene.renderXY(wallSprite,  isoPt.x+borderOffset.x, isoPt.y + borderOffset.y, false);
-                    }
-                }
-                
-                function cartesianToIsometric(cartPt){
-                    var tempPt=new Phaser.Point();
-                    tempPt.x=cartPt.x-cartPt.y;
-                    tempPt.y=(cartPt.x+cartPt.y)/2;
-                    return (tempPt);
-                }
-                function isometricToCartesian(isoPt){
-                    var tempPt=new Phaser.Point();
-                    tempPt.x=(2*isoPt.y+isoPt.x)/2;
-                    tempPt.y=(2*isoPt.y-isoPt.x)/2;
-                    return (tempPt);
-                }
-                
-                var bootState = {
-                    create: function() {
-                        game.state.start('load');
-                    }
-                };
-                var loadState = {
-                    preload: function() {
-                        game.load.image('logo', 'images/phaser.png');
-                        game.load.image('tile1', 'tiles/000.png');
-                        game.load.image('tile2', 'tiles/001.png');
-                        
-                        game.load.spritesheet('character', 'characterSheets/cowboy.png', 128, 128, 140);
-                    },
-                    create: function() {
-                        game.state.start('title');
-                    }
-                };
-                var titleState = {
-                    player: {
-                    },
-                    create: function() {
-                        var self = this;
-                        //~ var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-                        //~ logo.anchor.setTo(0.5, 0.5);
-                        
-                        game.stage.backgroundColor = '#cccccc';
-                        game.stage.disableVisibilityChange = true;
-                        console.log("Initialising gameScene");
-                        gameScene = game.add.renderTexture(game.width,game.height);
-                        game.add.sprite(0,0,gameScene);
-                        floorSprite = game.make.sprite(0,0,'tile1');
-                        wallSprite = game.make.sprite(0,0,'tile2');
-                        
-                        self.player = game.add.sprite(200,200, 'character');
-                        self.player.scale.setTo(0.5,0.5);
-                        self.player.frame = 1;
-                        game.add.existing(self.player);
-                        self.player.anchor.setTo(.5, 1);
-                        
-                        self.player.animations.add('walk', [57, 58, 59, 60, 61, 62, 63, 64], 6);
-                        self.player.animations.play('walk');
-                        
-                        
-                        createLevel();
-                        
-                        var nameLabel = game.add.text(160,80, "Cliquer n'importe où pour démarrer", {
-                            font: '14px Space Mone', fill: '#ffffff'
-                        });
-                        game.input.activePointer.capture = true;
-                    },
-                    update: function() {
-                        var self = this;
-                        
-                        self.player.animations.play('walk');
-                        
-                        if( game.input.activePointer.isDown ) {
-                            //~ game.state.start('play');
-                        }
-                    }
-                };
-                
-                //  Note that this html file is set to pull down Phaser 2.5.0 from the JS Delivr CDN.
-                //  Although it will work fine with this tutorial, it's almost certainly not the most current version.
-                //  Be sure to replace it with an updated version before you start experimenting with adding your own code.
-                //~ var game = new Phaser.Game(480, 360, Phaser.AUTO, '', { preload: preload, create: create }, 'jeu');
-                var game = new Phaser.Game(480, 360, Phaser.AUTO, 'gameDiv');
-                
-                game.state.add('boot', bootState);
-                game.state.add('load', loadState);
-                game.state.add('title', titleState);
-                
-                game.state.start('boot');
-
-            };
-        </script>
+        
     </body>
 </html>
